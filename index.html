@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>REAL PRIME MT | Calculadora de Orçamentos</title>
+<style>
+:root{--bg:#111;--panel:#1c1c1c;--gold:#c9a45d;--gold2:#ead19a;--text:#f4f1e9;--muted:#aaa49a;--line:#403a30}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -15%,#373127 0,#111 48%);color:var(--text);font:15px/1.45 Arial,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:22px 15px 45px}
+.brand{text-align:center;padding:15px 0 22px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.monogram{width:60px;height:60px;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center;margin:0 auto 9px;color:var(--gold2);font:bold 23px Georgia,serif;letter-spacing:-3px;padding-right:3px}
+.brand h1{margin:0;font:bold 25px Georgia,serif;letter-spacing:4px}
+.brand h1 span{color:var(--gold)}
+.brand p{margin:6px 0 0;color:var(--muted);font-size:10px;letter-spacing:3px}
+h2{font-size:15px;letter-spacing:1.1px;color:var(--gold2);margin:0 0 14px;text-transform:uppercase}
+.panel{background:linear-gradient(145deg,#202020,#171717);border:1px solid var(--line);border-radius:13px;padding:18px;margin:14px 0;box-shadow:0 9px 28px #0003}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+label{font-size:12px;color:var(--muted)}
+input,select,textarea{width:100%;background:#101010;color:var(--text);border:1px solid #494237;border-radius:7px;padding:10px;font:inherit;min-width:0}
+input:focus,select:focus,textarea:focus{outline:1px solid var(--gold)}
+.checkbox-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#141414;border:1px solid #3c362c;border-radius:8px;cursor:pointer;user-select:none}
+.checkbox-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
+.checkbox-row span{font-weight:bold;color:var(--gold2);font-size:14px}
+.cuba-box{margin-top:12px;padding:14px;background:#151411;border:1px dashed #635335;border-radius:9px;display:none}
+.cuba-box.active{display:block}
+.material-head,.material{display:grid;grid-template-columns:2fr .7fr .8fr 1fr 1fr 36px;gap:7px;align-items:center}
+.material-head{font-size:10px;color:var(--muted);padding:0 0 8px}
+.material{padding:8px 0;border-top:1px solid #34302a}
+.material input,.material select{padding:9px 6px;font-size:13px}
+.material .subtotal{font-size:12px;text-align:right;color:var(--gold2);font-weight:bold}
+button{border:0;border-radius:7px;padding:10px 14px;font-weight:bold;cursor:pointer}
+.primary{background:linear-gradient(135deg,var(--gold2),#a9823e);color:#17130c}
+.secondary{background:#2b2925;color:var(--gold2);border:1px solid #655638}
+.danger,.remove{background:#3b2522;color:#f1b2a8;border:1px solid #71443c}
+.remove{padding:8px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.metric{background:#111;border:1px solid var(--line);border-radius:9px;padding:13px}
+.metric small{display:block;color:var(--muted);font-size:11px}
+.metric strong{display:block;color:var(--gold2);font-size:18px;margin-top:5px}
+.totalbox{background:linear-gradient(120deg,#29251d,#171613);border:1px solid var(--gold);padding:16px;border-radius:10px;margin-top:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.totalbox strong{font-size:25px;color:var(--gold2)}
+.thanks-box{margin-top:14px;padding:14px 16px;border-left:3px solid var(--gold);background:#161512;border-radius:0 8px 8px 0;font-size:13.5px;color:var(--text)}
+.thanks-box strong{color:var(--gold2)}
+.note{color:var(--muted);font-size:11px;margin:9px 0 0}
+.saved-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.saved-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #39342b}
+.saved-info strong{display:block}
+.saved-info small{color:var(--muted)}
+.saved-actions{display:flex;gap:7px;flex-wrap:wrap}
+.saved-actions button{padding:8px 10px;font-size:12px}
+.empty{color:var(--muted);padding:12px 0}
+.status{font-size:12px;color:#b8d3a7;min-height:17px}
+.badge{display:inline-block;background:#26231d;border:1px solid #594b31;color:var(--gold2);font-size:11px;padding:3px 8px;border-radius:5px;margin-top:6px}
+
+@media(max-width:680px){
+  .material-head{display:none}
+  .material{grid-template-columns:1fr 1fr;gap:7px;padding:11px 0}
+  .material .name{grid-column:1/-1}
+  .material .subtotal{text-align:left}
+  .material .remove{justify-self:end}
+  .summary,.grid,.grid-3{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  .totalbox{align-items:flex-start;flex-direction:column}
+  .saved-item{align-items:flex-start;flex-direction:column}
+}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important;color:#171717!important;font-size:11px}
+  .wrap{max-width:none;padding:0}
+  .brand{border-bottom:2px solid #b28c45;margin-bottom:10px;padding:0 0 10px}
+  .brand h1{color:#171717}
+  .brand p{color:#555}
+  .monogram{color:#8b6b32;border-color:#8b6b32}
+  .panel{background:#fff!important;border:1px solid #ccc;box-shadow:none;padding:11px;margin:9px 0;break-inside:avoid}
+  h2{color:#805f27;margin-bottom:8px}
+  label{color:#555}
+  input,select,textarea{border:0;border-bottom:1px solid #ddd;background:#fff!important;color:#111!important;padding:3px 0}
+  .material-head{display:grid;grid-template-columns:2.4fr .8fr .8fr 1.2fr;color:#555;border-bottom:1px solid #ccc;padding-bottom:4px}
+  .material{grid-template-columns:2.4fr .8fr .8fr 1.2fr;border-color:#eee;padding:5px 0}
+  .material input,.material select{border:0;padding:2px}
+  .material .subtotal{color:#6c501e;font-size:11.5px}
+  .col-cost,.cost,.remove,.no-print,.saved-panel,.metric-cost,.badge{display:none!important}
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .metric{background:#fafafa;border-color:#ccc;padding:9px}
+  .metric small{color:#555}
+  .metric strong,.totalbox strong{color:#6c501e}
+  .totalbox{background:#faf8f2;border-color:#9a793b;padding:12px}
+  .cuba-box{background:#faf8f2;border:1px solid #cbb382;padding:9px}
+  .thanks-box{background:#faf8f2;border-left:3px solid #9a793b;color:#222;padding:10px 12px;margin-top:10px}
+  .thanks-box strong{color:#6c501e}
+  .note{color:#555}
+  footer{color:#555!important;border-top:1px solid #ddd;margin-top:10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <div class="monogram">RP</div>
+    <h1>REAL PRIME <span>MT</span></h1>
+    <p>PORCELANATO • BANCADAS • ACABAMENTOS DE ALTO PADRÃO</p>
+    <div class="badge no-print" id="storageBadge">Memória interna ativa</div>
+  </header>
+
+  <section class="panel">
+    <h2>01 · Dados do orçamento</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="client">Nome do cliente</label>
+        <input id="client" placeholder="Nome completo do cliente">
+      </div>
+      <div class="field">
+        <label for="date">Data do orçamento</label>
+        <input id="date" type="date">
+      </div>
+      <div class="field">
+        <label for="project">Obra / Ambiente</label>
+        <input id="project" placeholder="Ex.: Cozinha gourmet, Banheiro suíte...">
+      </div>
+      <div class="field">
+        <label for="service">Tipo de serviço</label>
+        <select id="service">
+          <option>Bancada</option>
+          <option>Lavatório</option>
+          <option>Ilha</option>
+          <option>Nicho</option>
+          <option>Projeto personalizado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="area">Área para mão de obra (m²)</label>
+        <input id="area" type="number" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label for="laborRate">Valor da mão de obra por m² (R$)</label>
+        <input id="laborRate" type="number" min="0" step="1" value="180">
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <label class="checkbox-row" for="hasCuba">
+        <input type="checkbox" id="hasCuba">
+        <span>Incluir Cuba Esculpida neste projeto</span>
+      </label>
+
+      <div class="cuba-box" id="cubaBox">
+        <div class="grid-3">
+          <div class="field">
+            <label for="cubaW">Largura da cuba (m)</label>
+            <input id="cubaW" type="number" min="0" step="0.01" placeholder="Ex.: 0.30" value="0">
+          </div>
+          <div class="field">
+            <label for="cubaL">Comprimento da cuba (m)</label>
+            <input id="cubaL" type="number" min="0" step="0.01" placeholder="Ex.: 0.40" value="0">
+          </div>
+          <div class="field">
+            <label>Valor calculado da Cuba Esculpida</label>
+            <input id="cubaPriceDisplay" value="R$ 0,00" readonly style="font-weight:bold;color:var(--gold2)">
+          </div>
+        </div>
+        <p class="note" id="cubaFormulaNote">Fórmula aplicada: (Largura + Comprimento) + 10% sobre o valor total do Porcelanato.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>02 · Materiais e acabamento</h2>
+    <div class="grid no-print" style="margin-bottom:13px">
+      <div class="field">
+        <label for="margin">Margem de revenda sobre o custo (%)</label>
+        <input id="margin" type="number" min="0" step="1" value="30">
+      </div>
+      <div class="field">
+        <label>Regra de cálculo interna</label>
+        <input value="Custo unitário + margem de revenda (oculto no PDF)" readonly>
+      </div>
+    </div>
+
+    <div class="material-head">
+      <span>Material / Descrição</span>
+      <span>Qtd.</span>
+      <span>Unidade</span>
+      <span class="col-cost">Custo unit. (R$)</span>
+      <span style="text-align:right">Valor (R$)</span>
+      <span class="no-print"></span>
+    </div>
+    <div id="materials"></div>
+
+    <div class="actions no-print">
+      <button class="secondary" id="add">+ Adicionar material</button>
+    </div>
+    <p class="note no-print">Informe o custo unitário e a quantidade. No PDF do cliente aparecerá apenas o valor final de revenda de cada item.</p>
+  </section>
+
+  <section class="panel">
+    <h2>03 · Resumo do investimento</h2>
+    <div class="summary">
+      <div class="metric metric-cost no-print">
+        <small>Custo interno dos materiais</small>
+        <strong id="costTotal">R$ 0,00</strong>
+      </div>
+      <div class="metric">
+        <small>Materiais e insumos (c/ cuba se inclusa)</small>
+        <strong id="saleTotal">R$ 0,00</strong>
+      </div>
+      <div class="metric">
+        <small>Mão de obra especializada</small>
+        <strong id="laborTotal">R$ 0,00</strong>
+      </div>
+    </div>
+
+    <div class="totalbox">
+      <div>
+        <small>INVESTIMENTO TOTAL DO PROJETO</small>
+        <div class="note">Materiais de acabamento + execução especializada</div>
+      </div>
+      <strong id="grandTotal">R$ 0,00</strong>
+    </div>
+
+    <div class="grid" style="margin-top:13px">
+      <div class="field">
+        <label for="validity">Validade da proposta</label>
+        <input id="validity" value="10 dias corridos">
+      </div>
+      <div class="field">
+        <label for="payment">Condições de pagamento</label>
+        <input id="payment" placeholder="Ex.: 50% entrada + 50% na entrega / Pix / Cartão">
+      </div>
+      <div class="field full">
+        <label for="obs">Observações técnicas e prazos</label>
+        <textarea id="obs" rows="3" placeholder="Prazo estimado de entrega, detalhes de instalação, itens inclusos..."></textarea>
+      </div>
+    </div>
+
+    <div class="thanks-box" id="thanksMessage">
+      Prezado(a) <strong>Cliente</strong>, agradecemos pela oportunidade de apresentar esta proposta. Na <strong>REAL PRIME MT</strong>, cada peça é executada com precisão artesanal e acabamento de alto padrão para valorizar o seu ambiente.
+    </div>
+
+    <div class="actions no-print">
+      <button class="primary" id="save">Salvar na memória do aparelho</button>
+      <button class="secondary" id="pdf">Gerar PDF para cliente</button>
+      <button class="danger" id="clear">Novo orçamento</button>
+    </div>
+    <p class="status no-print" id="status" aria-live="polite"></p>
+    <p class="note no-print">Os orçamentos são gravados diretamente no banco de dados interno (IndexedDB) deste aparelho, funcionando mesmo sem internet.</p>
+  </section>
+
+  <section class="panel saved-panel no-print">
+    <div class="saved-header">
+      <h2 style="margin:0">04 · Orçamentos salvos na memória interna</h2>
+      <div class="saved-actions">
+        <button class="secondary" id="exportBackup" title="Baixar cópia de segurança de todos os orçamentos">Exportar Backup (.json)</button>
+        <button class="secondary" id="importBackupBtn" title="Restaurar orçamentos de um arquivo de backup">Importar Backup</button>
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </div>
+    </div>
+    <div id="savedList"><div class="empty">Nenhum orçamento salvo ainda.</div></div>
+    <p class="note">Todos os dados permanecem armazenados localmente na memória interna do navegador deste dispositivo.</p>
+  </section>
+
+  <footer style="text-align:center;color:#827b6e;font-size:11px;padding:12px">
+    REAL PRIME MT · Porcelanataria Fina & Acabamentos · Qualidade em cada detalhe.
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const money = n => (Number(n) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const DEFAULTS = ['Porcelanato', 'PU', 'Massa plástica', 'Tubo de aço galvanizado'];
+let editingId = null;
+
+// --- BANCO DE DADOS INTERNO (IndexedDB + Fallback LocalStorage) ---
+const DB_NAME = 'RealPrimeMT_DB';
+const STORE_NAME = 'orcamentos';
+let dbInstance = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (dbInstance) return resolve(dbInstance);
+    if (!window.indexedDB) return reject('IndexedDB não suportado');
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => {
+      dbInstance = e.target.result;
+      resolve(dbInstance);
+    };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function requestPersistentStorage() {
+  if (navigator.storage && navigator.storage.persist) {
+    const isPersisted = await navigator.storage.persist();
+    $('storageBadge').textContent = isPersisted
+      ? 'Memória interna protegida ativa'
+      : 'Memória interna do dispositivo ativa';
+  }
+}
+
+async function getAllBudgets() {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const list = req.result || [];
+        list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        resolve(list);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    return JSON.parse(localStorage.getItem('realPrimeBudgets') || '[]');
+  }
+}
+
+async function putBudget(entry) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(entry);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) {
+    const arr = JSON.parse(localStorage.getItem('realPrimeBudgets') || '[]');
+    const idx = arr.findIndex(x => x.id === entry.id);
+    if (idx >= 0) arr[idx] = entry; else arr.unshift(entry);
+    localStorage.setItem('realPrimeBudgets', JSON.stringify(arr));
+  }
+}
+
+async function removeBudgetDB(id) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).delete(id);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) {
+    const arr = JSON.parse(localStorage.getItem('realPrimeBudgets') || '[]').filter(x => x.id !== id);
+    localStorage.setItem('realPrimeBudgets', JSON.stringify(arr));
+  }
+}
+
+// Migra orçamentos antigos do localStorage para o IndexedDB automaticamente
+async function migrateLegacyStorage() {
+  try {
+    const legacy = JSON.parse(localStorage.getItem('realPrimeBudgets') || '[]');
+    if (legacy.length > 0) {
+      for (const item of legacy) {
+        if (!item.updatedAt) item.updatedAt = Date.now();
+        await putBudget(item);
+      }
+      localStorage.removeItem('realPrimeBudgets');
+    }
+  } catch (e) {}
+}
+
+// --- LÓGICA DA CALCULADORA ---
+function updateThanks() {
+  const clientName = $('client').value.trim() || 'Cliente';
+  $('thanksMessage').innerHTML = `Prezado(a) <strong>${clientName}</strong>, agradecemos pela confiança e pela oportunidade de apresentar esta proposta. Na <strong>REAL PRIME MT</strong>, cada projeto é executado com precisão técnica e acabamento de alto padrão para transformar o seu ambiente.`;
+}
+
+function toggleCuba() {
+  const checked = $('hasCuba').checked;
+  $('cubaBox').classList.toggle('active', checked);
+  if (!checked) {
+    $('cubaW').value = 0;
+    $('cubaL').value = 0;
+  }
+  calculate();
+}
+
+function addMaterial(item = {}) {
+  const r = document.createElement('div');
+  r.className = 'material';
+  r.innerHTML = `
+    <input class="name" aria-label="Material" placeholder="Nome do material">
+    <input class="qty" aria-label="Quantidade" type="number" min="0" step="0.01">
+    <select class="unit" aria-label="Unidade">
+      <option>un</option>
+      <option>m²</option>
+      <option>m</option>
+      <option>kg</option>
+      <option>barra</option>
+      <option>lata</option>
+      <option>tubo</option>
+      <option>kit</option>
+    </select>
+    <input class="cost" aria-label="Custo unitário" type="number" min="0" step="0.01" placeholder="0,00">
+    <span class="subtotal">R$ 0,00</span>
+    <button class="remove no-print" title="Remover material">×</button>
+  `;
+  r.querySelector('.name').value = item.name ?? '';
+  r.querySelector('.qty').value = item.qty ?? 1;
+  r.querySelector('.unit').value = item.unit ?? 'un';
+  r.querySelector('.cost').value = item.cost ?? 0;
+
+  r.querySelectorAll('input,select').forEach(x => x.addEventListener('input', calculate));
+  r.querySelector('.remove').addEventListener('click', () => { r.remove(); calculate(); });
+  $('materials').appendChild(r);
+  calculate();
+}
+
+function getMaterials() {
+  return [...$('materials').querySelectorAll('.material')].map(r => ({
+    name: r.querySelector('.name').value,
+    qty: +r.querySelector('.qty').value || 0,
+    unit: r.querySelector('.unit').value,
+    cost: +r.querySelector('.cost').value || 0
+  }));
+}
+
+function calculate() {
+  let cost = 0;
+  let sale = 0;
+  let porcelanatoSale = 0;
+  const m = Math.max(0, +$('margin').value || 0) / 100;
+
+  $('materials').querySelectorAll('.material').forEach(r => {
+    const name = r.querySelector('.name').value.trim().toLowerCase();
+    const q = Math.max(0, +r.querySelector('.qty').value || 0);
+    const c = Math.max(0, +r.querySelector('.cost').value || 0);
+    const itemSale = q * c * (1 + m);
+
+    cost += q * c;
+    sale += itemSale;
+    r.querySelector('.subtotal').textContent = money(itemSale);
+
+    if (name.includes('porcelanato')) {
+      porcelanatoSale += itemSale;
+    }
+  });
+
+  let cubaTotal = 0;
+  if ($('hasCuba').checked) {
+    const w = Math.max(0, +$('cubaW').value || 0);
+    const l = Math.max(0, +$('cubaL').value || 0);
+    const dimSum = w + l;
+    const porcTenPercent = porcelanatoSale * 0.10;
+    cubaTotal = dimSum + porcTenPercent;
+    $('cubaPriceDisplay').value = money(cubaTotal);
+    $('cubaFormulaNote').textContent = `Cálculo detalhado: (${w.toFixed(2)} + ${l.toFixed(2)} = ${dimSum.toFixed(2)}) + 10% do porcelanato (${money(porcTenPercent)}) = ${money(cubaTotal)}`;
+  } else {
+    $('cubaPriceDisplay').value = 'R$ 0,00';
+  }
+
+  const totalMaterialsSale = sale + cubaTotal;
+  const laborRate = Math.max(0, +$('laborRate').value || 0);
+  const labor = Math.max(0, +$('area').value || 0) * laborRate;
+  const grandTotal = totalMaterialsSale + labor;
+
+  $('costTotal').textContent = money(cost);
+  $('saleTotal').textContent = money(totalMaterialsSale);
+  $('laborTotal').textContent = money(labor);
+  $('grandTotal').textContent = money(grandTotal);
+
+  return { cost, sale: totalMaterialsSale, cubaTotal, labor, total: grandTotal };
+}
+
+function formData() {
+  return {
+    client: $('client').value.trim(),
+    date: $('date').value,
+    project: $('project').value.trim(),
+    service: $('service').value,
+    area: +$('area').value || 0,
+    laborRate: +$('laborRate').value || 180,
+    hasCuba: $('hasCuba').checked,
+    cubaW: +$('cubaW').value || 0,
+    cubaL: +$('cubaL').value || 0,
+    margin: +$('margin').value || 0,
+    validity: $('validity').value.trim(),
+    payment: $('payment').value.trim(),
+    materials: getMaterials(),
+    obs: $('obs').value,
+    totals: calculate(),
+    updatedAt: Date.now()
+  };
+}
+
+async function saveBudget() {
+  const d = formData();
+  if (!d.client && !d.project) {
+    alert('Informe o nome do cliente ou a identificação da obra.');
+    return;
+  }
+  const id = editingId || 'rp-' + Date.now();
+  const entry = { ...d, id };
+  await putBudget(entry);
+  editingId = id;
+  $('save').textContent = 'Atualizar na memória';
+  $('status').textContent = 'Orçamento salvo na memória interna do dispositivo!';
+  await renderSaved();
+}
+
+async function renderSaved() {
+  const root = $('savedList');
+  const a = await getAllBudgets();
+  root.innerHTML = '';
+  if (!a.length) {
+    root.innerHTML = '<div class="empty">Nenhum orçamento salvo na memória interna ainda.</div>';
+    return;
+  }
+  a.forEach(x => {
+    const item = document.createElement('div');
+    item.className = 'saved-item';
+    const info = document.createElement('div');
+    info.className = 'saved-info';
+    const title = document.createElement('strong');
+    title.textContent = x.client || x.project || 'Orçamento';
+    const sub = document.createElement('small');
+    sub.textContent = `${x.service} · ${x.date || 'Sem data'} · ${money(x.totals?.total || 0)}`;
+    info.append(title, sub);
+
+    const acts = document.createElement('div');
+    acts.className = 'saved-actions no-print';
+    [
+      ['Abrir / editar', () => loadBudget(x.id), 'secondary'],
+      ['PDF', async () => { await loadBudget(x.id, false); printPDF(); }, 'secondary'],
+      ['Excluir', () => deleteBudget(x.id), 'danger']
+    ].forEach(([t, fn, cl]) => {
+      const b = document.createElement('button');
+      b.textContent = t;
+      b.className = cl;
+      b.onclick = fn;
+      acts.append(b);
+    });
+    item.append(info, acts);
+    root.append(item);
+  });
+}
+
+async function loadBudget(id, scroll = true) {
+  const all = await getAllBudgets();
+  const x = all.find(v => v.id === id);
+  if (!x) return;
+  editingId = id;
+  $('client').value = x.client || '';
+  $('date').value = x.date || '';
+  $('project').value = x.project || '';
+  $('service').value = x.service || 'Bancada';
+  $('area').value = x.area || 0;
+  $('laborRate').value = x.laborRate ?? 180;
+  $('hasCuba').checked = !!x.hasCuba;
+  $('cubaW').value = x.cubaW || 0;
+  $('cubaL').value = x.cubaL || 0;
+  $('cubaBox').classList.toggle('active', !!x.hasCuba);
+  $('margin').value = x.margin ?? 30;
+  $('validity').value = x.validity || '10 dias corridos';
+  $('payment').value = x.payment || '';
+  $('obs').value = x.obs || '';
+  $('materials').innerHTML = '';
+  (x.materials || []).forEach(addMaterial);
+  $('save').textContent = 'Atualizar na memória';
+  $('status').textContent = 'Orçamento carregado da memória interna.';
+  updateThanks();
+  calculate();
+  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function deleteBudget(id) {
+  if (!confirm('Excluir este orçamento da memória interna?')) return;
+  await removeBudgetDB(id);
+  if (editingId === id) editingId = null;
+  await renderSaved();
+}
+
+function printPDF() {
+  if (!$('date').value) $('date').value = new Date().toISOString().slice(0, 10);
+  document.title = 'Orcamento-Real-Prime-MT-' + (($('client').value.trim() || 'Cliente').replace(/\s+/g, '-'));
+  window.print();
+}
+
+function reset() {
+  editingId = null;
+  $('client').value = '';
+  $('project').value = '';
+  $('date').value = new Date().toISOString().slice(0, 10);
+  $('service').selectedIndex = 0;
+  $('area').value = 0;
+  $('laborRate').value = 180;
+  $('hasCuba').checked = false;
+  $('cubaW').value = 0;
+  $('cubaL').value = 0;
+  $('cubaBox').classList.remove('active');
+  $('margin').value = 30;
+  $('validity').value = '10 dias corridos';
+  $('payment').value = '';
+  $('obs').value = '';
+  $('materials').innerHTML = '';
+  DEFAULTS.forEach(name => addMaterial({ name, qty: 1, unit: 'un', cost: 0 }));
+  $('save').textContent = 'Salvar na memória do aparelho';
+  $('status').textContent = '';
+  updateThanks();
+  calculate();
+}
+
+// --- BACKUP MANUAL PARA SEGURANÇA EXTRA ---
+$('exportBackup').onclick = async () => {
+  const data = await getAllBudgets();
+  if (!data.length) return alert('Não há orçamentos salvos para exportar.');
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `backup-orcamentos-real-prime-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+$('importBackupBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const list = JSON.parse(text);
+    if (!Array.isArray(list)) throw new Error();
+    for (const item of list) {
+      if (item && item.id) await putBudget(item);
+    }
+    await renderSaved();
+    $('status').textContent = `${list.length} orçamento(s) restaurado(s) para a memória interna!`;
+  } catch (err) {
+    alert('Arquivo de backup inválido.');
+  }
+  e.target.value = '';
+};
+
+$('add').onclick = () => addMaterial({ name: 'Novo material', qty: 1, unit: 'un', cost: 0 });
+$('client').oninput = updateThanks;
+$('hasCuba').onchange = toggleCuba;
+$('cubaW').oninput = calculate;
+$('cubaL').oninput = calculate;
+$('margin').oninput = calculate;
+$('area').oninput = calculate;
+$('laborRate').oninput = calculate;
+$('save').onclick = saveBudget;
+$('pdf').onclick = printPDF;
+$('clear').onclick = () => {
+  if (confirm('Começar um novo orçamento? Os orçamentos salvos na memória serão mantidos.')) reset();
+};
+
+(async () => {
+  await requestPersistentStorage();
+  await migrateLegacyStorage();
+  reset();
+  await renderSaved();
+})();
+</script>
+</body>
+</html>
